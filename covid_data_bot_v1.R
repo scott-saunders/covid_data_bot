@@ -28,14 +28,12 @@ states <- counties %>% group_by(state) %>% summarise()
 #READ IN PREVIOUS TWEETS
 previous_tweets = read_csv("previous_tweets.csv", col_types = 'cl')
 
+print(previous_tweets)
+
 #SEARCH FOR ALL RECENT TWEETS TO HANDLE
 tweets = search_tweets(q = "@covid_data_bot", include_rts = F)
-#tweets$status_id
-#tweets$text[1]
-#post_tweet("This is a test with media", media = c("county_template_files/figure-html/unnamed-chunk-2-1.png","county_template_files/figure-html/unnamed-chunk-3-1.png" ))
 
-#test set of tweet
-#tweets = tibble(status_id = c(1,2,3), text =c('Cobb County, Georgia', 'a;lsdkjf', 'a;lskfj, Georgia'))
+print(tweets)
 
 
 #LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS THEN REPLY.
