@@ -3,7 +3,7 @@ name: covid_data_bot_v1
 on: push
 
 jobs:
-  covid_data_box-post:
+  covid_data_bot-post:
     runs-on: macOS-latest
     env:
       TWITTER_CONSUMER_API_KEY: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
