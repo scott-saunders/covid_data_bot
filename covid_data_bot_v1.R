@@ -1,7 +1,10 @@
-install.packages(c('rtweet','tidyverse'))
+
+
+install.packages(c('rtweet','tidyverse','scales'), Ncpus = 2)
 
 library(rtweet)
 library(tidyverse)
+library(scales)
 
 # create token named "twitter_token"
 create_token(
@@ -46,6 +49,7 @@ tweets = search_tweets(q = "@covid_data_bot", include_rts = F)
 
 print(tweets)
 
+#tweets = tibble(status_id = c('1'), text = c('Cobb County, Georgia'))
 
 #LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS THEN REPLY.
 for (i in 1:nrow(tweets)){
@@ -75,15 +79,20 @@ for (i in 1:nrow(tweets)){
           filter(state == tweet_state & county == tweet_county) %>% 
           filter(date == max(date))
         
-        draft_tweet <- paste("This is a test reply to ",tweets$status_id[i],
-                             '\nHere is some covid-19 info for ', tweet_county," County, ", tweet_state,
-                             '\nfrom: ', most_recent$date,
-                             '\nDaily cases: ', most_recent$daily_cases,
-                             '\nDaily deaths: ', most_recent$daily_deaths,
-                             '\nTotal cases to date: ',most_recent$cases,
-                             '\nTotal deaths to date: ', most_recent$deaths,sep = '')
+        most_recent_pop <- left_join(most_recent, pop, by = 'fips') %>% 
+          mutate(cases_per_pop = cases / pop2019)
+        
+        draft_tweet <- paste0("Greetings. Here's covid-19 data reported for ", tweet_county," County, ", tweet_state,
+                             ' from: ', most_recent$date,
+                             '\nDaily cases: ', comma(most_recent$daily_cases),
+                             '\nDaily deaths: ', comma(most_recent$daily_deaths),
+                             '\nTotal cases to date: ',comma(most_recent$cases), 
+                             ' (', percent(most_recent_pop$cases_per_pop, accuracy = 0.01),' of population)',
+                             '\nTotal deaths to date: ', comma(most_recent$deaths),
+                             '\nData source: NYT'
+        )
         print(draft_tweet)
-        post_tweet(draft_tweet, in_reply_to_status_id = tweets$status_id[i])
+        #post_tweet(draft_tweet, in_reply_to_status_id = tweets$status_id[i])
         
         
       }
