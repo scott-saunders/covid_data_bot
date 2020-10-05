@@ -24,7 +24,7 @@ counties <- nyt_data %>% group_by(state,county,fips) %>% summarise()
 
 states <- counties %>% group_by(state) %>% summarise()
 
-pop <- read_csv('data/co-est2019-alldata.csv') %>% 
+pop <- read_csv('co-est2019-alldata.csv') %>% 
   mutate(fips = paste0(STATE,COUNTY)) %>% 
   filter(COUNTY!='000') %>% 
   select(fips, pop2019 = POPESTIMATE2019)
