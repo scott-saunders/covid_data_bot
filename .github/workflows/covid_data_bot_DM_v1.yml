@@ -1,0 +1,25 @@
+name: covid_data_bot_DM_v1
+
+on: push
+
+jobs:
+  covid_data_bot-dm:
+    runs-on: macOS-latest
+    env:
+      TWITTER_CONSUMER_API_KEY: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+      TWITTER_CONSUMER_API_SECRET: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
+      TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+      TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+      MAPBOX_PUBLIC_ACCESS_TOKEN: ${{ secrets.MAPBOX_PUBLIC_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@master
+      - name: Create and post DM
+        run: Rscript covid_data_bot_dms_v1.R
+      - name: Commit and push previous messages
+        run: |
+          git config user.email "ssaunder@caltech.edu"
+          git config user.name "scott-saunders"
+          git add previous_messages.csv
+          git commit -m "update previous messages file"
+          git push

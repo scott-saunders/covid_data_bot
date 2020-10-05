@@ -1,5 +1,4 @@
 
-
 install.packages(c('rtweet','tidyverse','scales'), Ncpus = 2)
 
 library(rtweet)
@@ -14,7 +13,6 @@ create_token(
   access_token = Sys.getenv("TWITTER_ACCESS_TOKEN"),
   access_secret = Sys.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 )
-
 
 nyt_data <- read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv') %>% 
   group_by(state, county, fips) %>% arrange(date) %>% 
@@ -32,34 +30,29 @@ pop <- read_csv('co-est2019-alldata.csv') %>%
   filter(COUNTY!='000') %>% 
   select(fips, pop2019 = POPESTIMATE2019)
 
-tweet_state <- NULL
-tweet_county <- NULL
-
-draft_tweet_header <- '\U1F6A8***\U1F916***\U1F6A8\n'
-draft_tweet_body <- paste0('Greetings. Here is an update for ', tweet_county, ' County, ', tweet_state,':\n')
-#post_tweet(paste0(draft_tweet_header, draft_tweet_body))
-
 #READ IN PREVIOUS TWEETS
-previous_tweets = read_csv("previous_tweets.csv", col_types = 'cl')
+previous_messages = read_csv("previous_messages.csv", col_types = 'cl')
 
-print(previous_tweets)
+print(previous_messages)
 
 #SEARCH FOR ALL RECENT TWEETS TO HANDLE
-tweets = search_tweets(q = "@covid_data_bot", include_rts = F)
+raw_messages <-  direct_messages()
 
-print(tweets)
+messages <- tibble(id = raw_messages$events$id,
+       sender_id = raw_messages$events$message_create$sender_id,
+       text = raw_messages$events$message_create$message_data$text) %>% 
+  filter(sender_id != 1309922170487730176)
 
-#tweets = tibble(status_id = c('1'), text = c('Cobb County, Georgia'))
+print(messages)
 
-#LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS THEN REPLY.
-for (i in 1:nrow(tweets)){
-  print(tweets$status_id[i])
+for (i in 1:nrow(messages)){
+  print(messages$id[i])
   
   
   #IF ID IS NOT IN PREVIOUS TWEETS
-  if (!(tweets$status_id[i] %in% previous_tweets$id)){
+  if (!(messages$id[i] %in% previous_messages$id)){
     
-    tweet_state <- states$state[str_detect(tweets$text[i], fixed(states$state,ignore_case = T))]
+    tweet_state <- states$state[str_detect(messages$text[i], fixed(states$state, ignore_case = T))]
     print(tweet_state)
     
     
@@ -68,7 +61,7 @@ for (i in 1:nrow(tweets)){
       
       counties_subset <- counties %>% filter(state == tweet_state)
       
-      tweet_county <- counties_subset$county[str_detect(tweets$text[i], fixed(counties_subset$county, ignore_case = T))]
+      tweet_county <- counties_subset$county[str_detect(messages$text[i], fixed(counties_subset$county, ignore_case = T))]
       print(tweet_county)
       
       if(length(tweet_county)==1){
@@ -83,18 +76,18 @@ for (i in 1:nrow(tweets)){
           mutate(cases_per_pop = cases / pop2019)
         
         draft_tweet <- paste0("Greetings. Here's covid-19 data reported for ", tweet_county," County, ", tweet_state,
-                             ' from ', format(as.Date(most_recent$date),'%D'),
-                             '\n\nDaily cases: ', comma(most_recent$daily_cases),
-                             '\nDaily deaths: ', comma(most_recent$daily_deaths),
-                             '\nTotal cases: ',comma(most_recent$cases), 
-                             ' (', percent(most_recent_pop$cases_per_pop, accuracy = 0.01),' of population)',
-                             '\nTotal deaths: ', comma(most_recent$deaths),
-                             '\n\nData source: NYT'
+                              ' from ', format(as.Date(most_recent$date),'%D'),
+                              '\n\nDaily cases: ', comma(most_recent$daily_cases),
+                              '\nDaily deaths: ', comma(most_recent$daily_deaths),
+                              '\nTotal cases: ',comma(most_recent$cases), 
+                              ' (', percent(most_recent_pop$cases_per_pop, accuracy = 0.01),' of population)',
+                              '\nTotal deaths: ', comma(most_recent$deaths),
+                              '\n\nData source: NYT'
         )
         
         print(draft_tweet)
         
-        post_tweet(draft_tweet, in_reply_to_status_id = tweets$status_id[i])
+        post_message(draft_tweet, user = messages$sender_id[i])
         
       }
       else{ print('county not found')}
@@ -103,9 +96,9 @@ for (i in 1:nrow(tweets)){
     else{ print('state not found')}
     
     #ADD TO PREVIOUS TWEETS
-    previous_tweets = bind_rows(previous_tweets, tibble(id = tweets$status_id[i], replied = T))
+    previous_messages = bind_rows(previous_messages, tibble(id = messages$id[i], replied = T))
     print('tweet archived')
-
+    
   }
   
   print("Done!")
@@ -113,7 +106,4 @@ for (i in 1:nrow(tweets)){
 }
 
 #previous_tweets = tibble(id = tweets$status_id, replied = T)
-write_csv(previous_tweets,"previous_tweets.csv")
-
-
-
+write_csv(previous_messages,"previous_messages.csv")
