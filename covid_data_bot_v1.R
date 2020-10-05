@@ -24,6 +24,17 @@ counties <- nyt_data %>% group_by(state,county,fips) %>% summarise()
 
 states <- counties %>% group_by(state) %>% summarise()
 
+pop <- read_csv('data/co-est2019-alldata.csv') %>% 
+  mutate(fips = paste0(STATE,COUNTY)) %>% 
+  filter(COUNTY!='000') %>% 
+  select(fips, pop2019 = POPESTIMATE2019)
+
+tweet_state <- NULL
+tweet_county <- NULL
+
+draft_tweet_header <- '\U1F6A8***\U1F916***\U1F6A8\n'
+draft_tweet_body <- paste0('Greetings. Here is an update for ', tweet_county, ' County, ', tweet_state,':\n')
+#post_tweet(paste0(draft_tweet_header, draft_tweet_body))
 
 #READ IN PREVIOUS TWEETS
 previous_tweets = read_csv("previous_tweets.csv", col_types = 'cl')

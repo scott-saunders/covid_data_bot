@@ -16,3 +16,9 @@ jobs:
       - uses: r-lib/actions/setup-r@master
       - name: Create and post tweet
         run: Rscript covid_data_bot_v1.R
+      - name: Commit previous tweets
+        run: |
+          git add previous_tweets.csv
+          git commit -m "update previous tweets file"
+      - name: Push previous tweets
+        uses: ad-m/github-push-action@master
