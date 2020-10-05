@@ -18,6 +18,8 @@ jobs:
         run: Rscript covid_data_bot_v1.R
       - name: Commit previous tweets
         run: |
+          git config --local user.email "ssaunder@caltech.edu"
+          git config --local user.name "scott-saunders"
           git add previous_tweets.csv
           git commit -m "update previous tweets file"
       - name: Push previous tweets
