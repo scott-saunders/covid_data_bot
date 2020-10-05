@@ -83,17 +83,18 @@ for (i in 1:nrow(tweets)){
           mutate(cases_per_pop = cases / pop2019)
         
         draft_tweet <- paste0("Greetings. Here's covid-19 data reported for ", tweet_county," County, ", tweet_state,
-                             ' from: ', most_recent$date,
-                             '\nDaily cases: ', comma(most_recent$daily_cases),
+                             ' from ', format(as.Date(most_recent$date),'%D'),
+                             '\n\nDaily cases: ', comma(most_recent$daily_cases),
                              '\nDaily deaths: ', comma(most_recent$daily_deaths),
-                             '\nTotal cases to date: ',comma(most_recent$cases), 
+                             '\nTotal cases: ',comma(most_recent$cases), 
                              ' (', percent(most_recent_pop$cases_per_pop, accuracy = 0.01),' of population)',
-                             '\nTotal deaths to date: ', comma(most_recent$deaths),
-                             '\nData source: NYT'
+                             '\nTotal deaths: ', comma(most_recent$deaths),
+                             '\n\nData source: NYT'
         )
-        print(draft_tweet)
-        #post_tweet(draft_tweet, in_reply_to_status_id = tweets$status_id[i])
         
+        print(draft_tweet)
+        
+        post_tweet(draft_tweet, in_reply_to_status_id = tweets$status_id[i])
         
       }
       else{ print('county not found')}
