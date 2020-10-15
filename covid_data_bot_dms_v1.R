@@ -65,11 +65,13 @@ for (i in 1:nrow(messages)){
           filter(COUNTY!='000') %>% 
           select(fips, pop2019 = POPESTIMATE2019)
         
+        print(list.files())
+        
         text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data)
         
         print(text)
         
-        list.files()
+        print(list.files())
         
         post_message(text, user = messages$sender_id[i], media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'))
         
