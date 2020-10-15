@@ -74,9 +74,9 @@ for (i in 1:nrow(messages)){
         #print(list.files())
         
         post_message(text, user = messages$sender_id[i], media = 'plot_cases.png')
-        post_message('', user = messages$sender_id[i], media = 'plot_deaths.png')
-        post_message('', user = messages$sender_id[i], media = 'plot_risk.png')
-        post_message('', user = messages$sender_id[i], media = 'plot_state_map.png')
+        post_message('deaths', user = messages$sender_id[i], media = 'plot_deaths.png')
+        post_message('risk', user = messages$sender_id[i], media = 'plot_risk.png')
+        post_message('map', user = messages$sender_id[i], media = 'plot_state_map.png')
       }
       else{ print('county not found')}
       

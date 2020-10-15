@@ -20,6 +20,7 @@ jobs:
         run: |
           git config user.email "ssaunder@caltech.edu"
           git config user.name "scott-saunders"
+          git pull
           git add previous_tweets.csv
           git commit --allow-empty -m "update previous tweets file"
           git push
