@@ -151,7 +151,7 @@ draft_tweet <- function(state, county, case_data, pop_data){
     mutate(biweekly_cases = cases-lag(cases,14)) %>% 
     filter(date == max(date)) %>% 
     ungroup() %>% 
-    left_join(.,pop,by = 'fips') %>% 
+    left_join(.,pop_data,by = 'fips') %>% 
     mutate(total_cases_pop = cases / pop2019,
            biweekly_cases_pop = biweekly_cases / pop2019)
   
