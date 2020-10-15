@@ -18,7 +18,7 @@ Many counties and states also have their own data dashboards. Often these are no
 
 ## Details on provided data
 
-We consider case loads and case averages over two week time spans. 
+We consider case loads and case averages over two week time spans. Maps show per capita caseloads by county to ensure that comparisons can be made.
 
 ## Event risk calculation
 
