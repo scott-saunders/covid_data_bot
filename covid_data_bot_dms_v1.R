@@ -1,9 +1,8 @@
 
-install.packages(c('rtweet','tidyverse','scales'), Ncpus = 2)
+install.packages(c('rtweet', 'tidyverse'),Ncpus = 2)
 
-library(rtweet)
 library(tidyverse)
-library(scales)
+library(rtweet)
 
 # create token named "twitter_token"
 create_token(
@@ -14,21 +13,11 @@ create_token(
   access_secret = Sys.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 )
 
-nyt_data <- read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv') %>% 
-  group_by(state, county, fips) %>% arrange(date) %>% 
-  mutate(daily_cases = cases - lag(cases,1,default = 0),
-         daily_deaths = deaths - lag(deaths,1,default = 0)) %>% 
-  mutate(daily_cases = ifelse(daily_cases<0,0,daily_cases)) %>% 
-  mutate(daily_deaths = ifelse(daily_deaths<0,0,daily_deaths))
 
-counties <- nyt_data %>% group_by(state,county,fips) %>% summarise()
 
-states <- counties %>% group_by(state) %>% summarise()
+counties <- read_csv('nyt_county_list.csv')
 
-pop <- read_csv('co-est2019-alldata.csv') %>% 
-  mutate(fips = paste0(STATE,COUNTY)) %>% 
-  filter(COUNTY!='000') %>% 
-  select(fips, pop2019 = POPESTIMATE2019)
+states <- read_csv('nyt_state_list.csv')
 
 #READ IN PREVIOUS TWEETS
 previous_messages = read_csv("previous_messages.csv", col_types = 'cl')
@@ -67,27 +56,20 @@ for (i in 1:nrow(messages)){
       if(length(tweet_county)==1){
         print('county found')
         
-        #find most recent daily case / death count for this county
-        most_recent <- nyt_data %>% 
-          filter(state == tweet_state & county == tweet_county) %>% 
-          filter(date == max(date))
+        source('draft_tweet_functions.R')
         
-        most_recent_pop <- left_join(most_recent, pop, by = 'fips') %>% 
-          mutate(cases_per_pop = cases / pop2019)
+        nyt_data <- read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
         
-        draft_tweet <- paste0("Greetings. Here's covid-19 data reported for ", tweet_county," County, ", tweet_state,
-                              ' from ', format(as.Date(most_recent$date),'%D'),
-                              '\n\nDaily cases: ', comma(most_recent$daily_cases),
-                              '\nDaily deaths: ', comma(most_recent$daily_deaths),
-                              '\nTotal cases: ',comma(most_recent$cases), 
-                              ' (', percent(most_recent_pop$cases_per_pop, accuracy = 0.01),' of population)',
-                              '\nTotal deaths: ', comma(most_recent$deaths),
-                              '\n\nData source: NYT'
-        )
+        pop_data <- read_csv('us_county_census.csv') %>% filter(COUNTY!='000')  %>% 
+          mutate(fips = paste0(STATE,COUNTY)) %>% 
+          filter(COUNTY!='000') %>% 
+          select(fips, pop2019 = POPESTIMATE2019)
         
-        print(draft_tweet)
+        text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data)
         
-        post_message(draft_tweet, user = messages$sender_id[i])
+        print(text)
+        
+        post_message(text, user = messages$sender_id[i], media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'))
         
       }
       else{ print('county not found')}
