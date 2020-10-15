@@ -1,6 +1,6 @@
 
 
-install.packages('rtweet', 'tidyverse',Ncpus = 2)
+install.packages(c('rtweet', 'tidyverse'),Ncpus = 2)
 
 library(tidyverse)
 library(rtweet)

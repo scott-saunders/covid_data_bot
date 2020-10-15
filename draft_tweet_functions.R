@@ -6,6 +6,7 @@ library(scales)
 library(zoo)
 
 #tweet_state <- 'Oklahoma'
+
 #tweet_county <- 'Tulsa'
 calculate_risk <- function(p_i, n){
   1-(1-p_i)^n
