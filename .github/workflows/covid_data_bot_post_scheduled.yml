@@ -1,9 +1,11 @@
-name: covid_data_bot_DM_v1
+name: covid_data_bot_post_scheduled
 
-on: push
+on: 
+  schedule:
+    - cron: '*/15 * * * *'
 
 jobs:
-  covid_data_bot-dm:
+  covid_data_bot-post:
     runs-on: macOS-latest
     env:
       TWITTER_CONSUMER_API_KEY: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
@@ -14,12 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@master
-      - name: Create and post DM
-        run: Rscript covid_data_bot_dms_v1.R
-      - name: Commit and push previous messages
+      - name: Create and post tweet
+        run: Rscript covid_data_bot_v1.R
+      - name: Commit and push previous tweets
         run: |
           git config user.email "ssaunder@caltech.edu"
           git config user.name "scott-saunders"
-          git add previous_messages.csv
-          git commit -m "update previous messages file"
+          git add previous_tweets.csv
+          git commit --allow-empty -m "update previous tweets file"
           git push
