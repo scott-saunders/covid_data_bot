@@ -24,19 +24,12 @@ We consider case loads and case averages over two week time spans.
 
 This calculation simply asks the question: **What is the probability that no one is infected?** The probability that at least one person is infected will be 1 minus that value. Credit to [Joshua Weitz](https://twitter.com/joshuasweitz) for this idea.
 
-The probability that any individual person is infected is the overall or population level infection rate, 
-$$p_i$$ 
+The probability that any individual person is infected is the overall or population level infection rate, <img src="https://render.githubusercontent.com/render/math?math=p_i">
 
-The probability they are not infected is
+The probability they are not infected is, <img src="https://render.githubusercontent.com/render/math?math=1 - p_i">
 
-$$1-p_i$$. 
+The probability that multiple people, <img src="https://render.githubusercontent.com/render/math?math=n"> are not infected is, <img src="https://render.githubusercontent.com/render/math?math=(1 - p_i)^n">
 
-The probability that multiple people, $n$ are not infected is 
-
-$$(1-p_i)^n$$
-
-Finally, the probability that one or more people are infected among $n$ people is 
-
-$$1-(1-p_i)^n$$
+Finally, the probability that one or more people are infected among <img src="https://render.githubusercontent.com/render/math?math=n"> people is, <img src="https://render.githubusercontent.com/render/math?math=1 - (1 - p_i)^n">
 
 1x, 5x and 10x scenarios are given because cases are undercounts. 
