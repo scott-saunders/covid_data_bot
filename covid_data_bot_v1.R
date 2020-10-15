@@ -19,8 +19,8 @@ counties <- read_csv('nyt_county_list.csv')
 
 states <- read_csv('nyt_state_list.csv')
 
-#tweet_state <- NULL
-#tweet_county <- NULL
+#tweet_state <- 'Cobb'
+#tweet_county <- 'Georgia'
 
 
 #READ IN PREVIOUS TWEETS

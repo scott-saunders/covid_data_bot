@@ -65,16 +65,18 @@ for (i in 1:nrow(messages)){
           filter(COUNTY!='000') %>% 
           select(fips, pop2019 = POPESTIMATE2019)
         
-        print(list.files())
+        #print(list.files())
         
         text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data)
         
         print(text)
         
-        print(list.files())
+        #print(list.files())
         
-        post_message(text, user = messages$sender_id[i], media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'))
-        
+        post_message(text, user = messages$sender_id[i], media = 'plot_cases.png')
+        post_message('', user = messages$sender_id[i], media = 'plot_deaths.png')
+        post_message('', user = messages$sender_id[i], media = 'plot_risk.png')
+        post_message('', user = messages$sender_id[i], media = 'plot_state_map.png')
       }
       else{ print('county not found')}
       
