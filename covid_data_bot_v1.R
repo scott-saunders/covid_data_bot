@@ -64,7 +64,7 @@ for (i in 1:nrow(tweets)){
         
         nyt_data <- read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
         
-        pop <- read_csv('us_county_census.csv') %>% filter(COUNTY!='000')  %>% 
+        pop_data <- read_csv('us_county_census.csv') %>% filter(COUNTY!='000')  %>% 
           mutate(fips = paste0(STATE,COUNTY)) %>% 
           filter(COUNTY!='000') %>% 
           select(fips, pop2019 = POPESTIMATE2019)
