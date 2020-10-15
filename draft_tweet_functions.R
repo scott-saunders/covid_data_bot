@@ -1,8 +1,7 @@
 #This script is called when the bot finds a new tweet or message to respond
 
-install.packages(c('tidyverse','scales','zoo'), Ncpus = 2)
+install.packages(c('scales','zoo'), Ncpus = 2)
 
-library(tidyverse)
 library(scales)
 library(zoo)
 
@@ -72,7 +71,7 @@ draft_tweet <- function(state, county, case_data, pop_data){
                  '\n10x: ',  percent(calculate_risk(10*county_data$biweekly_cases_pop, 100))
   )
   
-  return(text)
+
   
   ####### Generate Plots
   
@@ -87,11 +86,30 @@ draft_tweet <- function(state, county, case_data, pop_data){
     mutate(avg_daily_cases = rollmean(daily_cases, 14, fill = NA),
            avg_daily_deaths = rollmean(daily_deaths, 14, fill = NA))
   
-  plot_cases <- ggplot(county_data_series, aes(x = date, y = daily_cases)) + geom_point() + geom_line(aes(y = avg_daily_cases), color = 'red') + theme_bw()
+  plot_cases <- ggplot(county_data_series, aes(x = date, y = daily_cases)) + 
+    geom_point(size = 1, shape = 21) + 
+    geom_line(aes(y = avg_daily_cases), color = 'red', size = 1) +
+    labs(x = 'Date', y = 'Daily cases', 
+         title = paste0('Daily cases for ',county, ' County, ', state, ' - ',format(as.Date(county_data$date),'%D')),
+         caption = 'Dots show daily reported cases. Red line shows 14 day rolling average. Source: NYT case data from @covid_data_bot') + 
+    theme_bw()+
+    theme(plot.title = element_text(hjust = 0.5, size = 6), 
+          axis.title = element_text(size=6),
+          axis.text = element_text(size = 4),
+          plot.caption = element_text(size = 4))
   
   ggsave("plot_cases.png",plot = plot_cases, width = 4, height = 2, units = 'in')
   
-  plot_deaths <- ggplot(county_data_series, aes(x = date, y = daily_deaths)) + geom_point() + geom_line(aes(y = avg_daily_deaths), color = 'red') + theme_bw()
+  plot_deaths <- ggplot(county_data_series, aes(x = date, y = daily_deaths)) + 
+    geom_point(size = 1, shape = 21) + geom_line(aes(y = avg_daily_deaths), color = 'red', size = 1) + 
+    labs(x = 'Date', y = 'Daily deaths', 
+         title = paste0('Daily deaths for ',county, ' County, ', state, ' - ',format(as.Date(county_data$date),'%D')),
+         caption = 'Dots show daily reported cases. Red line shows 14 day rolling average. Source: NYT case data from @covid_data_bot') + 
+    theme_bw()+
+    theme(plot.title = element_text(hjust = 0.5, size = 6), 
+          axis.title = element_text(size=6),
+          axis.text = element_text(size = 4),
+          plot.caption = element_text(size = 4))
   
   ggsave("plot_deaths.png",plot = plot_deaths, width = 4, height = 2, units = 'in')
   
@@ -100,19 +118,28 @@ draft_tweet <- function(state, county, case_data, pop_data){
     mutate(risk = calculate_risk(f_inf, n))
   
   
-  legend_labels <- c(paste0("1x Reported (", percent(county_data$biweekly_cases_pop), ")"), 
-                     paste0("5x (", percent(county_data$biweekly_cases_pop*5), ")"),
-                     paste0("10x (", percent(county_data$biweekly_cases_pop*10), ")"))
+  legend_labels <- c(paste0("Low\n1x (", percent(county_data$biweekly_cases_pop, accuracy = 0.01), ")"), 
+                     paste0("Medium\n5x (", percent(county_data$biweekly_cases_pop*5,accuracy = 0.01), ")"),
+                     paste0("High\n10x (", percent(county_data$biweekly_cases_pop*10, accuracy = 0.01), ")"))
+  
+  caption <- 'Note that all cases cannot be found & reported, so medium & high undercount scenarios are given. The chance an individual is infected is assumed to be the\n2 week case incidence, p. For a group of, n, people, the chance 1 or more are infected is, 1-(1-p)^n. Source: NYT case data analyzed by @covid_data_bot'
   
   plot_risk <- ggplot(df_calc, aes(x = n , y = risk, color = factor(percent(f_inf)), fill = factor(percent(f_inf)))) + 
     geom_path() + 
-    geom_point(shape = 21, color = 'black') + theme_bw() + 
+    geom_point(shape = 21, color = 'black', size = 1) +
     scale_y_continuous(labels = percent)+
-    scale_color_viridis_d(name = 'Percentage of county\nrecently infected', labels = legend_labels)+ 
-    scale_fill_viridis_d(name = 'Percentage of county\nrecently infected', labels = legend_labels) +
-    labs(title = paste0('What is the chance of someone being infected\nfor different scenarios in ',county,' county?'), 
+    scale_color_viridis_d(name = '2 week county incidence\nfor 1-10x undercount', labels = legend_labels,option = 'B',)+ 
+    scale_fill_viridis_d(name = '2 week county incidence\nfor 1-10x undercount', labels = legend_labels,option = 'B',) +
+    labs(title = paste0('Group size risk assessment for ',county,' County, ', state, ' - ', format(as.Date(county_data$date),'%D')),
+         caption = caption ,
          x = 'Number of people in a group', y = 'Chance at least 1 person is infected') + 
-    theme(plot.title = element_text(hjust = 0.5), legend.position = 'bottom')
+    theme_bw()+
+    theme(plot.title = element_text(hjust = 0.5, size = 6), 
+          axis.title = element_text(size=6),
+          axis.text = element_text(size = 4),
+          plot.caption = element_text(size = 4, hjust = 0.22),
+          legend.title = element_text(size = 6, hjust = 0.5),
+          legend.text = element_text(size = 6, hjust = 0.5))
   
   ggsave('plot_risk.png', plot_risk, width = 4, height = 2, units = 'in')
   
@@ -144,5 +171,7 @@ draft_tweet <- function(state, county, case_data, pop_data){
     theme(legend.text = element_text(size = 4), legend.title = element_text(size = 4)) + guides(fill = guide_colourbar(label.position = "right", barwidth = 0.5))
   
   ggsave('plot_state_map.png', plot_state_map, width = 4, height = 2, units = 'in')
+
   
+  return(text)
 }
