@@ -69,6 +69,8 @@ for (i in 1:nrow(messages)){
         
         print(text)
         
+        list.files()
+        
         post_message(text, user = messages$sender_id[i], media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'))
         
       }
