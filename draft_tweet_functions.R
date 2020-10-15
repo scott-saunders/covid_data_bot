@@ -1,9 +1,10 @@
 #This script is called when the bot finds a new tweet or message to respond
 
-install.packages(c('scales','zoo'), Ncpus = 2)
+install.packages(c('scales','zoo','mapproj'), Ncpus = 2)
 
 library(scales)
 library(zoo)
+library(mapproj)
 
 #tweet_state <- 'Oklahoma'
 
