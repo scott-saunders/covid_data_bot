@@ -188,7 +188,7 @@ draft_tweet <- function(state, county, case_data, pop_data){
     mutate(day10_cases = cases-lag(cases,10)) %>% 
     filter(date == max(date)) %>% 
     ungroup() %>% 
-    left_join(.,pop_data,by = 'fips') %>% 
+    left_join(.,pop_data,by = c('state','county','fips')) %>% 
     mutate(total_cases_pop = cases / pop2019,
            day10_cases_pop = day10_cases / pop2019)
   
@@ -198,7 +198,7 @@ draft_tweet <- function(state, county, case_data, pop_data){
   
   plot_state_map <- ggplot(county_data_map, aes(long,lat, group = group)) +
     geom_polygon(aes(fill = day10_cases_pop), color = "white", size = 0.1)+
-    geom_polygon(data = . %>% filter(county == !!county), fill = NA, color = 'black', size = 0.5)+
+    geom_polygon(data = . %>% filter(county == !!county), fill = NA, color = 'red', size = 0.5)+
     coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
     scale_fill_viridis_c(labels = per_hundred_thousand_label, 
                          option = 'B',
