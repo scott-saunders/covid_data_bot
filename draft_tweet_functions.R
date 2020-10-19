@@ -199,7 +199,7 @@ draft_tweet <- function(state, county, case_data, pop_data){
     geom_polygon(aes(fill = day10_cases_pop), color = "white", size = 0.1)+
     geom_polygon(data = . %>% filter(county == !!county), fill = NA, color = 'black', size = 0.5)+
     coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
-    scale_fill_viridis_c(labels = per_ten_thousand_label, 
+    scale_fill_viridis_c(labels = per_hundred_thousand_label, 
                          option = 'B',
                          name = paste0('Ten day cases per capita\nfor ',state,' counties\n',
                                        format(as.Date(county_data$date),'%D'),
