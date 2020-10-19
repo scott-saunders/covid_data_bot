@@ -82,7 +82,7 @@ draft_tweet <- function(state, county, case_data, pop_data){
   
   text <- paste0("Here's a report for ", county," County, ", state,
                  ' - ', format(as.Date(county_data$date),'%D'),
-                 '\n\nDaily cases:',comma(county_data$daily_cases),
+                 '\n\nDaily cases: ',comma(county_data$daily_cases),
                  '\nTotal: ', comma(county_data$cases), ' (', percent(county_data$total_cases_pop, accuracy = 0.1),' of pop)',
                  
                  '\n\nDaily deaths: ',comma(county_data$daily_deaths),
