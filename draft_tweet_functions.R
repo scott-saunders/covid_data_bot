@@ -75,7 +75,7 @@ draft_tweet <- function(state, county, case_data, pop_data){
   
   base_url <- 'https://covidactnow.org/us/'
   
-  paste0(base_url,
+  link <- paste0(base_url,
          str_replace(county_data$state,' ','_'),'-',
          county_data$abbreviation,'/county/',
          str_replace(county_data$county, ' ','_'),'_county')
@@ -89,7 +89,8 @@ draft_tweet <- function(state, county, case_data, pop_data){
                  '\nTotal: ', comma(county_data$deaths), ' (', comma(county_data$total_deaths_pop*100000), ' per 100k)' ,
                  '\n\nEstimated chance someone is infected in a random group of 100: ', 
                  percent(calculate_risk(county_data$day10_cases_pop, 100)),
-                 ' - ',percent(calculate_risk(10*county_data$day10_cases_pop, 100))
+                 ' - ',percent(calculate_risk(10*county_data$day10_cases_pop, 100)),
+                 '\n\nFurther info: ', link
   )
   
 
