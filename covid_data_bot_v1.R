@@ -1,6 +1,4 @@
-
-
-install.packages(c('rtweet', 'tidyverse'),Ncpus = 2)
+if(!(require('rtweet') & require('tidyverse'))) install.packages(c('rtweet', 'tidyverse'),Ncpus = 2)
 
 library(tidyverse)
 library(rtweet)
@@ -64,10 +62,7 @@ for (i in 1:nrow(tweets)){
         
         nyt_data <- read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
         
-        pop_data <- read_csv('us_county_census.csv') %>% filter(COUNTY!='000')  %>% 
-          mutate(fips = paste0(STATE,COUNTY)) %>% 
-          filter(COUNTY!='000') %>% 
-          select(fips, pop2019 = POPESTIMATE2019)
+        pop_data <- read_csv('us_county_census.csv')
         
         text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data)
         
