@@ -44,6 +44,13 @@ for (i in 1:nrow(tweets)){
     tweet_state <- states$state[str_detect(tweets$text[i], fixed(states$state,ignore_case = T))]
     print(tweet_state)
     
+    if(length(tweet_state)>1){
+      tweet_state <- tibble(tweet_state) %>% 
+        mutate(length = str_length(tweet_state)) %>% 
+        filter(length == max(length)) %>% 
+        select(tweet_state) %>% 
+        as.character()
+    }
     
     if(length(tweet_state)==1){
       print('state found')
@@ -52,6 +59,16 @@ for (i in 1:nrow(tweets)){
       
       tweet_county <- counties_subset$county[str_detect(tweets$text[i], fixed(counties_subset$county, ignore_case = T))]
       print(tweet_county)
+      
+      if(length(tweet_county)>1){
+        tweet_county <- tibble(tweet_county) %>% 
+          mutate(length = str_length(tweet_county)) %>% 
+          filter(length == max(length)) %>% 
+          select(tweet_county) %>% 
+          as.character()
+      }
+      
+
       
       if(length(tweet_county)==1){
         print('county found')
