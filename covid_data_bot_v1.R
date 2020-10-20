@@ -1,6 +1,10 @@
-if(!(require('rtweet') & require('tidyverse'))) install.packages(c('rtweet', 'tidyverse'),Ncpus = 2)
+if(!(require('rtweet') & require('dplyr') & require('readr') & require('stringr'))){
+  install.packages(c('rtweet', 'dplyr','readr','stringr'),Ncpus = 2)
+}
 
-library(tidyverse)
+library(dplyr)
+library(stringr)
+library(readr)
 library(rtweet)
 
 
@@ -33,7 +37,7 @@ print(tweets)
 
 #tweets = tibble(status_id = c('1'), text = c('Cobb County, Georgia'))
 
-#LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS THEN REPLY.
+#LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS, AND COUNTY/STATE FOUND THEN REPLY.
 for (i in 1:nrow(tweets)){
   print(tweets$status_id[i])
   
@@ -44,6 +48,7 @@ for (i in 1:nrow(tweets)){
     tweet_state <- states$state[str_detect(tweets$text[i], fixed(states$state,ignore_case = T))]
     print(tweet_state)
     
+    #If multiple states are found, try to just take the longest state. This is specifically for West Virginia / Virginia
     if(length(tweet_state)>1){
       tweet_state <- tibble(tweet_state) %>% 
         mutate(length = str_length(tweet_state)) %>% 
@@ -52,14 +57,17 @@ for (i in 1:nrow(tweets)){
         as.character()
     }
     
+    # IF A STATE IS FOUND
     if(length(tweet_state)==1){
       print('state found')
       
+      #Look for counties only in the found state
       counties_subset <- counties %>% filter(state == tweet_state)
       
       tweet_county <- counties_subset$county[str_detect(tweets$text[i], fixed(counties_subset$county, ignore_case = T))]
       print(tweet_county)
       
+      #If multiple counties are found, take the longest, most specific one
       if(length(tweet_county)>1){
         tweet_county <- tibble(tweet_county) %>% 
           mutate(length = str_length(tweet_county)) %>% 
@@ -69,23 +77,29 @@ for (i in 1:nrow(tweets)){
       }
       
 
-      
+      # IF A COUNTY IS FOUND
       if(length(tweet_county)==1){
         print('county found')
         
-        ###############
+        #Get functions and data to draft tweet
         
         source('draft_tweet_functions.R')
         
         nyt_data <- read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
-        
         pop_data <- read_csv('us_county_census.csv')
         
+        #draft tweet. returns tweet text. plots are files written to directory
         text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data, tweets$screen_name[i])
-        
         print(text)
         
-        post_tweet(status = text, media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'), in_reply_to_status_id = tweets$status_id[i])
+        #Check again to see if tweet has already been replied to, because github actions are slow and can overlap
+        previous_tweets = read_csv("previous_tweets.csv", col_types = c('cl'))
+        
+        if (!(tweets$status_id[i] %in% previous_tweets$id)){
+          post_tweet(status = text, 
+                     media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'), 
+                     in_reply_to_status_id = tweets$status_id[i])
+        }
       
       }
       else{ print('county not found')}

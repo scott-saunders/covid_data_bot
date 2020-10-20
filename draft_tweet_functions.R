@@ -1,9 +1,12 @@
 #This script is called when the bot finds a new tweet or message to respond
 
 
-if(!(require('scales') & require('zoo') & require('mapproj'))) install.packages(c('scales','zoo','mapproj'), Ncpus = 2)
+if(!(require('ggplot2') & require('scales') & require('zoo') & require('mapproj') & require('tidyr'))){
+  install.packages(c('ggplot2','scales','zoo','mapproj','tidyr'), Ncpus = 2)
+}
 
-
+library(ggplot2)
+library(tidyr)
 library(scales)
 library(zoo)
 library(mapproj)
