@@ -55,7 +55,7 @@ theme_nothing <- function(base_size = 12, legend = FALSE){
   }
 }
 
-draft_tweet <- function(state, county, case_data, pop_data){
+draft_tweet <- function(state, county, case_data, pop_data, screen_name){
   
   county_data <- case_data %>% 
     filter(state == !!state) %>% 
@@ -80,14 +80,14 @@ draft_tweet <- function(state, county, case_data, pop_data){
          county_data$abbreviation,'/county/',
          str_replace(county_data$county, ' ','_'),'_county')
   
-  text <- paste0("Here's #COVID19 data for #", str_replace(county,' ','')," County, #", str_replace(state,' ',''),
-                 ' - ', format(as.Date(county_data$date),'%D'),
-                 '\n\nDaily cases: ',comma(county_data$daily_cases),
+  text <- paste0('@',screen_name," Here's #COVID19 data for #", str_replace(county,' ','')," County, #", str_replace(state,' ',''),
+                 ' ', format(as.Date(county_data$date),'%D'),
+                 '\n\n1d cases: ',comma(county_data$daily_cases),
                  '\nTotal: ', comma(county_data$cases), ' (', percent(county_data$total_cases_pop, accuracy = 0.1),' of pop)',
                  
-                 '\n\nDaily deaths: ',comma(county_data$daily_deaths),
+                 '\n\n1d deaths: ',comma(county_data$daily_deaths),
                  '\nTotal: ', comma(county_data$deaths), ' (', comma(county_data$total_deaths_pop*100000), ' per 100k)' ,
-                 '\n\nEstimated risk of ≥1 case in a random group of 100: ', 
+                 '\n\nEst risk of ≥1 case in a random group of 100: ', 
                  percent(calculate_risk(county_data$day10_cases_pop, 100)),
                  ' - ',percent(calculate_risk(10*county_data$day10_cases_pop, 100)),
                  '\n\nFurther info: ', link

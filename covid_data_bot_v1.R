@@ -81,7 +81,7 @@ for (i in 1:nrow(tweets)){
         
         pop_data <- read_csv('us_county_census.csv')
         
-        text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data)
+        text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data, tweets$screen_name[i])
         
         print(text)
         
