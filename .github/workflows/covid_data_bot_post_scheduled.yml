@@ -2,7 +2,7 @@ name: covid_data_bot_post_scheduled
 
 on: 
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/10 * * * *'
 
 jobs:
   covid_data_bot-post:
