@@ -2,7 +2,7 @@
 
 
 if(!(require('ggplot2') & require('scales') & require('zoo') & require('mapproj') & require('tidyr'))){
-  install.packages(c('ggplot2','scales','zoo','mapproj','tidyr'), Ncpus = 2)
+  install.packages(c('ggplot2','scales','zoo','mapproj','tidyr'), Ncpus = 2, repos = "https://cloud.r-project.org/")
 }
 
 library(ggplot2)

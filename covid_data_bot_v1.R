@@ -1,5 +1,5 @@
 if(!(require('rtweet') & require('dplyr') & require('readr') & require('stringr'))){
-  install.packages(c('rtweet', 'dplyr','readr','stringr'),Ncpus = 2)
+  install.packages(c('rtweet', 'dplyr','readr','stringr'),Ncpus = 2, repos = "https://cloud.r-project.org/")
 }
 
 library(dplyr)
