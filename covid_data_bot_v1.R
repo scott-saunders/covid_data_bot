@@ -39,7 +39,7 @@ tweets = search_tweets(q = "@covid_data_bot", include_rts = F)
 #tweets <- get_mentions()
 print(tweets)
 
-tweets = tibble(status_id = c('1'), text = c('Santa Clara County, CA, please'))
+#tweets = tibble(status_id = c('1'), text = c('Santa Clara County, CA, please'))
 
 #LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS, AND COUNTY/STATE FOUND THEN REPLY.
 for (i in 1:nrow(tweets)){
