@@ -39,7 +39,7 @@ tweets = search_tweets(q = "@covid_data_bot", include_rts = F)
 #tweets <- get_mentions()
 print(tweets)
 
-#tweets = tibble(status_id = c('1'), text = c('Cobb County, Georgia'))
+tweets = tibble(status_id = c('1'), text = c('Santa Clara County, CA, please'))
 
 #LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS, AND COUNTY/STATE FOUND THEN REPLY.
 for (i in 1:nrow(tweets)){
@@ -59,6 +59,14 @@ for (i in 1:nrow(tweets)){
         filter(length == max(length)) %>% 
         select(tweet_state) %>% 
         as.character()
+      
+      print(tweet_state)
+    }
+    
+    #If a full state name is not found, check for capital abbreviation
+    if(length(tweet_state) == 0){
+      tweet_state <- states$state[str_detect(tweets$text[i], fixed(states$abbreviation,ignore_case = F))]
+      print(tweet_state)
     }
     
     # IF A STATE IS FOUND
