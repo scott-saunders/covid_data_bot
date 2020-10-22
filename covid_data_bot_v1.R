@@ -1,5 +1,5 @@
 if(!(require('rtweet') & require('dplyr') & require('readr') & require('stringr'))){
-  install.packages(c('rtweet', 'dplyr','readr','stringr'),Ncpus = 2)
+  install.packages(c('rtweet', 'dplyr','readr','stringr'),Ncpus = 2, repos = "https://cloud.r-project.org/")
 }
 
 library(dplyr)
@@ -26,16 +26,20 @@ states <- read_csv('nyt_state_list.csv')
 
 
 #READ IN PREVIOUS TWEETS
-previous_tweets = read_csv("previous_tweets.csv", col_types = c('cl'))
+previous_tweets = read_csv("previous_tweets.csv", col_types = c('c'))
+print(previous_tweets)
 
+#Update previous tweets with timeline tweets to avoid discrepancy
+timeline <- get_timeline('covid_data_bot') %>% select(id = reply_to_status_id)
+previous_tweets <- bind_rows(previous_tweets, timeline) %>% distinct()
 print(previous_tweets)
 
 #SEARCH FOR ALL RECENT TWEETS TO HANDLE
 tweets = search_tweets(q = "@covid_data_bot", include_rts = F)
-
+#tweets <- get_mentions()
 print(tweets)
 
-#tweets = tibble(status_id = c('1'), text = c('Cobb County, Georgia'))
+#tweets = tibble(status_id = c('1'), text = c('Santa Clara County, CA, please'))
 
 #LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS, AND COUNTY/STATE FOUND THEN REPLY.
 for (i in 1:nrow(tweets)){
@@ -55,6 +59,14 @@ for (i in 1:nrow(tweets)){
         filter(length == max(length)) %>% 
         select(tweet_state) %>% 
         as.character()
+      
+      print(tweet_state)
+    }
+    
+    #If a full state name is not found, check for capital abbreviation
+    if(length(tweet_state) == 0){
+      tweet_state <- states$state[str_detect(tweets$text[i], fixed(states$abbreviation,ignore_case = F))]
+      print(tweet_state)
     }
     
     # IF A STATE IS FOUND
@@ -93,9 +105,10 @@ for (i in 1:nrow(tweets)){
         print(text)
         
         #Check again to see if tweet has already been replied to, because github actions are slow and can overlap
-        previous_tweets = read_csv("previous_tweets.csv", col_types = c('cl'))
+        #previous_tweets = read_csv("previous_tweets.csv", col_types = c('c'))
+        update_timeline <- get_timeline('covid_data_bot') %>% select(id = reply_to_status_id)
         
-        if (!(tweets$status_id[i] %in% previous_tweets$id)){
+        if (!(tweets$status_id[i] %in% update_timeline$id)){
           post_tweet(status = text, 
                      media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'), 
                      in_reply_to_status_id = tweets$status_id[i])
@@ -108,7 +121,7 @@ for (i in 1:nrow(tweets)){
     else{ print('state not found')}
     
     #ADD TO PREVIOUS TWEETS
-    previous_tweets = bind_rows(previous_tweets, tibble(id = tweets$status_id[i], replied = T))
+    previous_tweets = bind_rows(previous_tweets, tibble(id = tweets$status_id[i]))
     print('tweet archived')
 
   }
