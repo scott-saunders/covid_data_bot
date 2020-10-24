@@ -1,0 +1,11 @@
+state,county,fips,abbreviation,text,status_id
+Alabama,Autauga,01001,AL,Alabama Autauga,01001
+Arkansas,Mississippi,05093,AR,Arkansas Mississippi,05093
+Indiana,Delaware,18035,IN,Indiana Delaware,18035
+Iowa,Delaware,19055,IA,Iowa Delaware,19055
+Missouri,Mississippi,29133,MO,Missouri Mississippi,29133
+New York,Delaware,36025,NY,New York Delaware,36025
+Ohio,Delaware,39041,OH,Ohio Delaware,39041
+Oklahoma,Delaware,40041,OK,Oklahoma Delaware,40041
+Puerto Rico,Florida,72054,NA,Puerto Rico Florida,72054
+Texas,Colorado,48089,TX,Texas Colorado,48089

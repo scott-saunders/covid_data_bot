@@ -39,6 +39,8 @@ tweets = search_tweets(q = "@covid_data_bot", include_rts = F)
 #tweets <- get_mentions()
 print(tweets)
 
+#states_not_found <- tweets[1,]
+#counties_not_found_2 <- tweets[1,]
 #tweets = tibble(status_id = c('1'), text = c('Santa Clara County, CA, please'))
 
 #LOOP THROUGH TWEET STATUS ID'S. IF STATUS IS NOT IN PREVIOUS TWEETS, AND COUNTY/STATE FOUND THEN REPLY.
@@ -52,21 +54,37 @@ for (i in 1:nrow(tweets)){
     tweet_state <- states$state[str_detect(tweets$text[i], fixed(states$state,ignore_case = T))]
     print(tweet_state)
     
-    #If multiple states are found, try to just take the longest state. This is specifically for West Virginia / Virginia
+    #If multiple states are found, check for the most common issue: counties called 'Washington'
     if(length(tweet_state)>1){
-      tweet_state <- tibble(tweet_state) %>% 
-        mutate(length = str_length(tweet_state)) %>% 
-        filter(length == max(length)) %>% 
-        select(tweet_state) %>% 
-        as.character()
+      
+      if('Washington' %in% tweet_state){
+        tweet_state <- as_tibble(tweet_state) %>% 
+          filter(value != 'Washington') %>% 
+          as_vector()
+        
+        print(tweet_state)
+      }
+    }
+    
+    #If multiple states are still found, try to just take the longest state. 
+    #This is specifically for West Virginia / Virginia and Arkansas / kansas
+    if(length(tweet_state)>1){
+        
+        tweet_state <- tibble(tweet_state) %>% 
+          mutate(length = str_length(tweet_state)) %>% 
+          filter(length == max(length)) %>% 
+          select(tweet_state) %>% 
+          as.character()
       
       print(tweet_state)
     }
     
     #If a full state name is not found, check for capital abbreviation
     if(length(tweet_state) == 0){
+      
       tweet_state <- states$state[str_detect(tweets$text[i], fixed(states$abbreviation,ignore_case = F))]
       print(tweet_state)
+      
     }
     
     # IF A STATE IS FOUND
@@ -79,7 +97,19 @@ for (i in 1:nrow(tweets)){
       tweet_county <- counties_subset$county[str_detect(tweets$text[i], fixed(counties_subset$county, ignore_case = T))]
       print(tweet_county)
       
-      #If multiple counties are found, take the longest, most specific one
+      #If multiple counties are found, check to see if that state has a county named the same
+      # E.g. arkansas county, arkansas
+      if(length(tweet_county)>1 & (tweet_state %in% (counties %>% filter(state==county))$state ) ){
+        
+        tweet_county <- tibble(tweet_county) %>% 
+          filter(tweet_county != tweet_state) %>% 
+          as_vector()
+        
+        print(tweet_county)
+      }
+      
+      
+      #If multiple counties are still found, take the longest, most specific one
       if(length(tweet_county)>1){
         tweet_county <- tibble(tweet_county) %>% 
           mutate(length = str_length(tweet_county)) %>% 
@@ -88,37 +118,64 @@ for (i in 1:nrow(tweets)){
           as.character()
       }
       
+      #If county is not found, check for confusing counties with the same names as states
+      if(length(tweet_county)==0){
+        counties_not_found <- read_csv('counties_not_found.csv') 
+        
+        for(j in 1:length(counties_not_found$state)){
+          
+          tweet_state <- states$state[str_detect(tweets$text[i], fixed(states$state,ignore_case = T))]
+          
+          vec_1 <- c(counties_not_found$state[j], counties_not_found$county[j])
+          
+          if(length(intersect(vec_1,tweet_state))==2){
+            tweet_state <- counties_not_found$state[j]
+            tweet_county <- counties_not_found$county[j]
+            
+            print(tweet_state)
+            print(tweet_county)
+          }
+        }
+          
+      }
+      
 
       # IF A COUNTY IS FOUND
       if(length(tweet_county)==1){
         print('county found')
         
         #Get functions and data to draft tweet
-        
         source('draft_tweet_functions.R')
-        
+
         nyt_data <- read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
         pop_data <- read_csv('us_county_census.csv')
-        
+
         #draft tweet. returns tweet text. plots are files written to directory
         text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data, tweets$screen_name[i])
         print(text)
-        
+
         #Check again to see if tweet has already been replied to, because github actions are slow and can overlap
         #previous_tweets = read_csv("previous_tweets.csv", col_types = c('c'))
+
         update_timeline <- get_timeline('covid_data_bot') %>% select(id = reply_to_status_id)
-        
-        if (!(tweets$status_id[i] %in% update_timeline$id)){
-          post_tweet(status = text, 
-                     media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'), 
-                     in_reply_to_status_id = tweets$status_id[i])
-        }
-      
+
+         if (!(tweets$status_id[i] %in% update_timeline$id)){
+           post_tweet(status = text,
+                      media = c('plot_cases.png', 'plot_deaths.png', 'plot_risk.png', 'plot_state_map.png'),
+                      in_reply_to_status_id = tweets$status_id[i])
+         }
+
       }
-      else{ print('county not found')}
+      else{ 
+        #counties_not_found_2 <- bind_rows(counties_not_found_2, tweets[i,])
+        print('county not found')
+      }
       
     } 
-    else{ print('state not found')}
+    else{ 
+      #states_not_found <- bind_rows(states_not_found, tweets[i,])
+      print('state not found')
+      }
     
     #ADD TO PREVIOUS TWEETS
     previous_tweets = bind_rows(previous_tweets, tibble(id = tweets$status_id[i]))

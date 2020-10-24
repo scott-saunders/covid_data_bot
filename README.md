@@ -16,6 +16,12 @@ Welcome. This repository contains a simple twitter bot, called @covid_data_bot, 
 
 Many counties and states also have their own data dashboards. Often these are not well advertised, but may be well maintained. Googling may yield good results. 
 
+## Special geographic cases
+
+New York City
+
+District of Columbia
+
 ## Event risk calculation 
 
 This calculation simply asks the question: **What is the probability that no one is infected?** The probability that at least one person is infected will be 1 minus that value. Credit to [Joshua Weitz](https://twitter.com/joshuasweitz) and the [COVID-19 Event Risk Assessment Planning Tool](https://covid19risk.biosci.gatech.edu/) for this idea.
