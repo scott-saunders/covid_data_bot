@@ -92,7 +92,7 @@ for (i in 1:nrow(tweets)){
       print('state found')
       
       #Look for counties only in the found state
-      counties_subset <- counties %>% filter(state == tweet_state)
+      counties_subset <- counties %>% filter(state == as.character(tweet_state))
       
       tweet_county <- counties_subset$county[str_detect(tweets$text[i], fixed(counties_subset$county, ignore_case = T))]
       print(tweet_county)
