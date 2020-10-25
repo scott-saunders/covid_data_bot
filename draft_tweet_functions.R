@@ -79,15 +79,14 @@ draft_tweet <- function(state, county, case_data, pop_data, screen_name){
   base_url <- 'https://covidactnow.org/us/'
   
   link <- paste0(base_url,
-         str_replace(county_data$state,' ','_'),'-',
+         str_replace_all(county_data$state,' ','_'),'-',
          county_data$abbreviation,'/county/',
-         str_replace(county_data$county, ' ','_'),'_county')
+         str_replace_all(county_data$county, ' ','_'),'_county')
   
-  text <- paste0('@',screen_name," Here's #COVID19 data for #", str_replace(county,' ','')," County, #", str_replace(state,' ',''),
+  text <- paste0('@',screen_name," Here's #COVID19 data for #", str_replace_all(county,' ','')," County, #", str_replace_all(state,' ',''),
                  ' ', format(as.Date(county_data$date),'%D'),
                  '\n\n1d cases: ',comma(county_data$daily_cases),
                  '\nTotal: ', comma(county_data$cases), ' (', percent(county_data$total_cases_pop, accuracy = 0.1),' of pop)',
-                 
                  '\n\n1d deaths: ',comma(county_data$daily_deaths),
                  '\nTotal: ', comma(county_data$deaths), ' (', comma(county_data$total_deaths_pop*100000), ' per 100k)' ,
                  '\n\nEst risk of ≥1 case in a random group of 100: ', 

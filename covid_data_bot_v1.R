@@ -60,7 +60,7 @@ for (i in 1:nrow(tweets)){
       if('Washington' %in% tweet_state){
         tweet_state <- as_tibble(tweet_state) %>% 
           filter(value != 'Washington') %>% 
-          as_vector()
+          as.vector()
         
         print(tweet_state)
       }
@@ -103,7 +103,7 @@ for (i in 1:nrow(tweets)){
         
         tweet_county <- tibble(tweet_county) %>% 
           filter(tweet_county != tweet_state) %>% 
-          as_vector()
+          as.vector()
         
         print(tweet_county)
       }
@@ -151,6 +151,8 @@ for (i in 1:nrow(tweets)){
         pop_data <- read_csv('us_county_census.csv')
 
         #draft tweet. returns tweet text. plots are files written to directory
+        
+        ### Update to draft tweet based on fips!
         text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data, tweets$screen_name[i])
         print(text)
 

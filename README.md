@@ -18,9 +18,29 @@ Many counties and states also have their own data dashboards. Often these are no
 
 ## Special geographic cases
 
-New York City
+In general, the most consistent way for COVID data bot to read counties and states is to use the full names, not abbreviations. E.g. Los Angeles, California (not CA). Capitalization and punctuation should not matter.
 
-District of Columbia
+### New York City 
+
+NYC is actually comprised of 5 different counties, but NYT only reports data for the city as a whole. Therefore COVID data bot can respond to a request like so "@covid_data_bot New York City NY." However, New York City is not included in the county level state map.
+
+### Washington, D.C.
+
+Washington is actually in  the District of Columbia County, within the 'state' District of Columbia. Therefore COVID data bot will respond to any request with DC spelled out: "@covid_data_bot District of Columbia." For now, it cannot deal with the D.C. abbreviation alone, because it also needs the county "District of Columbia."
+
+### Counties with State names (e.g. Washington County, Georgia)
+
+Many states have counties named "Washington", which is also a state. Previously COVID data bot could not handle this, but now the issue should be resolved and should function correctly. 
+
+There are also states that have counties with identical names (e.g. Arkansas County, Arkansas). COVID data bot should handle these correctly now. 
+
+There are 9 other US counties that have state names (besides 'Washington') that were an issue. For example, "Colorado County, Texas." Now this issue should be resolved.
+
+### Other issues
+
+If you believe COVID data bot is not recognizing your county / state request, please message on twitter or open issue in github. 
+
+Note that beyond simply identifying the correct state and county, COVID data bot must be able to find data for that county in the NYT dataset. If no data exists or there is an issue, then COVID data bot may fail or provide an empty report. 
 
 ## Event risk calculation 
 
