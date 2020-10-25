@@ -153,7 +153,7 @@ for (i in 1:nrow(tweets)){
         #draft tweet. returns tweet text. plots are files written to directory
         
         ### Update to draft tweet based on fips!
-        text <- draft_tweet(tweet_state, tweet_county, nyt_data, pop_data, tweets$screen_name[i])
+        text <- draft_tweet(as.character(tweet_state), as.character(tweet_county), nyt_data, pop_data, tweets$screen_name[i])
         print(text)
 
         #Check again to see if tweet has already been replied to, because github actions are slow and can overlap
